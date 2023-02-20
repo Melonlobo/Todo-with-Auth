@@ -97,7 +97,9 @@ function AddTodo({ getTodos }) {
 				contentLabel='Add Todo'>
 				<div className='new-todo'>
 					<h2 ref={(_subtitle) => (subtitle = _subtitle)}>New Todo</h2>
-					<button onClick={closeModal}>close</button>
+					<button className='close' onClick={closeModal}>
+						CLOSE
+					</button>
 				</div>
 				<form onSubmit={addTodo}>
 					<label htmlFor='title'>Title:</label>
@@ -112,10 +114,16 @@ function AddTodo({ getTodos }) {
 						{taskList?.length
 							? taskList.map((task, key) => {
 									return (
-										<div key={key}>
-											<span>{task.task}</span>
+										<div className='tasks' key={key}>
+											<span>
+												Task {key + 1}. {task.task}
+											</span>
 											<span>{task.isImportant ? 'Important!' : ''}</span>
-											<button onClick={(e) => deleteTask(e, key)}>X</button>
+											<button
+												className='close'
+												onClick={(e) => deleteTask(e, key)}>
+												X
+											</button>
 										</div>
 									);
 							  })
@@ -131,6 +139,8 @@ function AddTodo({ getTodos }) {
 								ref={newTask}
 								onChange={(e) => setTask(e.target.value.trim())}
 							/>
+						</div>
+						<div>
 							<label htmlFor='task'>Important:</label>
 							<input
 								type='checkbox'
@@ -141,10 +151,12 @@ function AddTodo({ getTodos }) {
 									setIsImportant(e.target.checked ? true : false);
 								}}
 							/>
-							<button onClick={addTask}>+</button>
 						</div>
+						<button className='add-btn' onClick={addTask}>
+							ADD
+						</button>
 					</div>
-					<input type='submit' value='ADD TODO' />
+					<input className='save' type='submit' value='ADD TODO' />
 				</form>
 			</Modal>
 		</div>

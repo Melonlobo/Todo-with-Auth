@@ -8,37 +8,10 @@ const Dashboard = () => {
 	const [search, setSearch] = useState('');
 	const [show, setShow] = useState(false);
 	const [id, setId] = useState('');
-	const [editTodo, setEditTodo] = useState();
 
 	const display = (id) => {
 		setId(id);
 		setShow((prevState) => !prevState);
-	};
-
-	const updateTodo = (e, id) => {
-		e.stopPropagation();
-		fetch('http://localhost:8000/updateTodo', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({
-				id,
-				title: 'Go Shopping',
-				tasks: [
-					{ task: 'buy chicken', isImportant: true },
-					{ task: 'buy eggs', isImportant: true },
-					{ task: 'buy vegetables', isImportant: false },
-					{ task: 'buy fruits', isImportant: true },
-				],
-				token: window.localStorage.getItem('token'),
-			}),
-		})
-			.then((res) => res.json())
-			.then((data) => {
-				if (data.success) getTodos();
-			})
-			.catch((err) => console.error(err.message));
 	};
 
 	const getTodos = () => {
@@ -118,13 +91,8 @@ const Dashboard = () => {
 						<div className='todo-head' onClick={() => display(todo._id)}>
 							<h3>{todo.title}</h3>
 							<div className='button-group'>
-								{/* <button onClick={(e) => updateTodo(e, todo._id)}>EDIT</button> */}
-								<EditTodo
-									// onClick={() => setEditTodo(todo)}
-									todo={todo._id === id && todo}
-									getTodos={getTodos}
-								/>
-								<button onClick={(e) => deleteTodo(e, todo._id)}>DELETE</button>
+								<EditTodo todo={todo} getTodos={getTodos} />
+								<button className='delete' onClick={(e) => deleteTodo(e, todo._id)}>DELETE</button>
 							</div>
 						</div>
 						<div className={show && todo._id === id ? '' : 'hidden'}>

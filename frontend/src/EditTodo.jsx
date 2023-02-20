@@ -1,9 +1,10 @@
-import React, { useState, useRef, useReducer } from 'react';
+import React, { useState, useRef } from 'react';
 import Modal from 'react-modal';
-// import './editTodo.css';
+import './editTodo.css';
 
 const customStyles = {
 	content: {
+		padding: '0',
 		top: '50%',
 		left: '50%',
 		right: 'auto',
@@ -16,17 +17,14 @@ const customStyles = {
 Modal.setAppElement('#root');
 
 function EditTodo({ todo, getTodos }) {
-	// const [title, setTitle] = useState(todo.title);
 	let subtitle;
 	const [modalIsOpen, setIsOpen] = useState(false);
-	const [state, dispatch] = useReducer(reducer, todo);
-	console.log(state);
-	// const resetCheckBox = React.useRef();
-	// const [taskList, setTaskList] = React.useState([]);
-	// const [task, setTask] = React.useState('');
-	// const [isImportant, setIsImportant] = React.useState(false);
-
-	function reducer(state, action) {}
+	const [title, setTitle] = useState(todo.title);
+	const [taskList, setTaskList] = useState(todo.tasks);
+	const [task, setTask] = useState('');
+	const newTask = useRef();
+	const resetCheckBox = useRef();
+	const [isImportant, setIsImportant] = useState(false);
 
 	function openModal() {
 		setIsOpen(true);
@@ -40,56 +38,61 @@ function EditTodo({ todo, getTodos }) {
 		setIsOpen(false);
 	}
 
-	// function addTask(e) {
-	// 	e.preventDefault();
-	// 	if (!task) return;
-	// 	setTaskList((prevList) => [...prevList, { task, isImportant }]);
-	// 	setTask('');
-	// 	newTask.current.value = '';
-	// 	setIsImportant(false);
-	// 	resetCheckBox.current.checked = false;
-	// }
+	function addTask(e) {
+		e.preventDefault();
+		if (!task) return;
+		setTaskList((prevList) => [...prevList, { task, isImportant }]);
+		setTask('');
+		newTask.current.value = '';
+		setIsImportant(false);
+		resetCheckBox.current.checked = false;
+	}
 
-	// function deleteTask(e, key) {
-	// 	e.preventDefault();
-	// 	const newTaskList = JSON.parse(JSON.stringify(taskList));
-	// 	newTaskList.splice(key, 1);
-	// 	setTaskList(newTaskList);
-	// }
+	function editTask(task, key, isImportant, isCompleted, _id) {
+		const newTaskList = JSON.parse(JSON.stringify(taskList));
+		newTaskList.splice(key, 1, { task, isImportant, isCompleted, _id });
+		setTaskList(newTaskList);
+	}
+
+	function deleteTask(e, key) {
+		e.preventDefault();
+		const newTaskList = JSON.parse(JSON.stringify(taskList));
+		newTaskList.splice(key, 1);
+		setTaskList(newTaskList);
+	}
 
 	function editTodo(e) {
 		e.preventDefault();
-		// try {
-		// 	if (!title || taskList.length < 1) return;
-		// 	fetch('http://localhost:8000/addTodo', {
-		// 		method: 'POST',
-		// 		headers: {
-		// 			'Content-Type': 'application/json',
-		// 		},
-		// 		body: JSON.stringify({
-		// 			title,
-		// 			tasks: taskList,
-		// 			token: window.localStorage.getItem('token'),
-		// 		}),
-		// 	})
-		// 		.then((res) => res.json())
-		// 		.then((data) => {
-		// 			if (data.success) {
-		// 				getTodos();
-		// 				e.target.reset();
-		// 				setIsImportant(false);
-		// 				setTaskList([]);
-		// 			}
-		// 		})
-		// 		.catch((err) => console.error(err.message));
-		// } catch (error) {
-		// 	console.log(error.message);
-		// }
+		try {
+			if (!title || taskList.length < 1) return;
+			fetch('http://localhost:8000/updateTodo', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					id: todo._id,
+					title,
+					tasks: taskList,
+					token: window.localStorage.getItem('token'),
+				}),
+			})
+				.then((res) => res.json())
+				.then((data) => {
+					if (data.success) {
+						getTodos();
+						setIsOpen(false);
+					}
+				})
+				.catch((err) => console.error(err.message));
+		} catch (error) {
+			console.error(error.message);
+		}
 	}
 
 	return (
 		<div>
-			<button className='edit-todo' onClick={openModal}>
+			<button className='edit' onClick={openModal}>
 				EDIT
 			</button>
 			<Modal
@@ -98,60 +101,123 @@ function EditTodo({ todo, getTodos }) {
 				onRequestClose={closeModal}
 				style={customStyles}
 				contentLabel='Edit Todo'>
-				<div className='edit-todo'>
-					<h2 ref={(_subtitle) => (subtitle = _subtitle)}>Edit Todo</h2>
-					<button onClick={closeModal}>close</button>
-				</div>
-				<form onSubmit={editTodo}>
-					<label htmlFor='title'>Title:</label>
-					{/* <p>{title}</p> */}
-					<input
-						type='text'
-						name='title'
-						id='title'
-						// ref={editTitle}
-						value={state.title}
-						// onChange={(e) => dispatch(e.target.value)}
-						required
-					/>
-					<div className='task-list'>
-						{todo.tasks?.length
-							? todo.tasks.map((task, key) => {
-									return (
-										<div key={key}>
-											<span>{task.task}</span>
-											<span>{task.isImportant ? 'Important!' : ''}</span>
-											{/* <button onClick={(e) => deleteTask(e, key)}>X</button> */}
-										</div>
-									);
-							  })
-							: ''}
+				<div className='modal' onClick={(e) => e.stopPropagation()}>
+					<div className='edit-todo'>
+						<h2 ref={(_subtitle) => (subtitle = _subtitle)}>Edit Todo</h2>
+						<button className='close' onClick={closeModal}>
+							CLOSE
+						</button>
 					</div>
-					<div className='tasks'>
-						<div>
-							<label htmlFor='task'>Task:</label>
-							<input
-								type='text'
-								name='task'
-								id='task'
-								// ref={newTask}
-								// onChange={(e) => setTask(e.target.value.trim())}
-							/>
-							{/* <label htmlFor='task'>Important:</label>
-							<input
-								type='checkbox'
-								name='important'
-								id='important'
-								ref={resetCheckBox}
-								onChange={(e) => {
-									setIsImportant(e.target.checked ? true : false);
-								}}
-							/> */}
-							{/* <button onClick={addTask}>+</button> */}
+					<form onSubmit={editTodo}>
+						<label htmlFor='title'>Title:</label>
+						<input
+							type='text'
+							name='title'
+							id='title'
+							defaultValue={title}
+							onChange={(e) => setTitle(e.target.value)}
+							required
+						/>
+						<div className='task-list'>
+							{taskList?.length
+								? taskList.map((task, key) => {
+										return (
+											<div className='tasks' key={key}>
+												<div>
+													<label htmlFor={'task' + key}>Task {key + 1}:</label>
+													<input
+														id={'task' + key}
+														type='text'
+														defaultValue={task.task}
+														onBlur={(e) => {
+															editTask(
+																e.target.value,
+																key,
+																task.isImportant,
+																task.isCompleted,
+																task._id
+															);
+														}}
+													/>
+												</div>
+												<div>
+													<label htmlFor={'isImportant' + key}>
+														Important:
+													</label>
+													<input
+														type='checkbox'
+														id={'isImportant' + key}
+														defaultChecked={task.isImportant}
+														onChange={(e) => {
+															editTask(
+																task.task,
+																key,
+																e.target.checked,
+																task.isCompleted,
+																task._id
+															);
+														}}
+													/>
+												</div>
+												<div>
+													<label htmlFor={'isCompleted' + key}>
+														Completed:
+													</label>
+													<input
+														type='checkbox'
+														id={'isCompleted' + key}
+														defaultChecked={task.isCompleted}
+														onChange={(e) =>
+															editTask(
+																task.task,
+																key,
+																task.isImportant,
+																e.target.checked,
+																task._id
+															)
+														}
+													/>
+												</div>
+												<button
+													className='close'
+													onClick={(e) => deleteTask(e, key)}>
+													X
+												</button>
+											</div>
+										);
+								  })
+								: ''}
 						</div>
-					</div>
-					<input type='submit' value='SAVE' />
-				</form>
+						<div className='add-task'>
+							<div>
+								<label htmlFor='task'>Add Task:</label>
+								<input
+									ref={newTask}
+									type='text'
+									name='task'
+									id='task'
+									onBlur={(e) => setTask(e.target.value.trim())}
+								/>
+							</div>
+							<div>
+								<label htmlFor='important'>Important:</label>
+								<input
+									ref={resetCheckBox}
+									type='checkbox'
+									name='important'
+									id='important'
+									onChange={(e) => {
+										setIsImportant(e.target.checked);
+									}}
+								/>
+							</div>
+							<button className='add-btn' onClick={(e) => addTask(e)}>
+								ADD
+							</button>
+						</div>
+						<input className='save' type='submit' value='SAVE' />
+					</form>
+				</div>
 			</Modal>
 		</div>
 	);

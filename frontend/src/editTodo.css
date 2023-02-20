@@ -1,0 +1,69 @@
+.modal {
+	padding: 2rem;
+}
+.edit {
+	background-color: #00f;
+	padding: 0.3rem 0;
+	color: #fff;
+	width: 5rem;
+	border-radius: 0.2rem;
+}
+.edit:hover {
+	background-color: #0000c2;
+}
+.edit-todo {
+	display: flex;
+	justify-content: space-between;
+}
+.close {
+	background: #f00;
+	color: #fff;
+	padding: 0.2rem 1rem;
+	border-radius: 0.2rem;
+}
+.close:hover {
+	background: #c00000;
+}
+form {
+	padding-top: 1rem;
+}
+.task-list {
+	padding: 1rem 0;
+}
+.tasks {
+	padding: 0.5rem 0;
+	display: flex;
+	justify-content: space-between;
+	gap: 1rem;
+}
+.add-task {
+	display: flex;
+	justify-content: space-evenly;
+	padding-bottom: 1rem;
+}
+input[type='text'] {
+	padding: 0.2rem;
+}
+input {
+	margin-left: 0.3rem;
+}
+.add-btn {
+	background: #00b400;
+	color: #fff;
+	padding: 0.2rem 1rem;
+	border-radius: 0.2rem;
+}
+.add-btn:hover {
+	background-color: #008a00;
+}
+.save {
+	background: #00f;
+	color: #fff;
+	padding: 0.5rem 1rem;
+	border-radius: 0.2rem;
+	border: none;
+}
+.save:hover {
+	background-color: #0000b1;
+	cursor: pointer;
+}
