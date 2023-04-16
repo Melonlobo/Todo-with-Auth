@@ -72,7 +72,13 @@ const Dashboard = () => {
 
 	return (
 		<div className='dashboard'>
+			<div className='head'>
 			<h1 className='main-title'>MY TODO LIST</h1>
+			<button className='logout' onClick={e => {
+				localStorage.removeItem('token');
+				location.replace('login');
+			}}>LOGOUT</button>
+			</div>
 			<div className='add-search'>
 				<AddTodo getTodos={getTodos} />
 				<form onSubmit={getSearches} className='search-form'>
